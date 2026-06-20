@@ -1,0 +1,239 @@
+import random
+import time
+
+def simple_chatbot():
+    """A simple rule-based chatbot with predefined responses"""
+    
+    # Predefined responses
+    responses = {
+        "greeting": [
+            "Hello! 👋 Nice to meet you!",
+            "Hi there! How can I help you today?",
+            "Hey! Great to see you!",
+            "Greetings! What brings you here?"
+        ],
+        "how_are_you": [
+            "I'm doing great, thanks for asking! 😊",
+            "I'm fine! Just chatting with you!",
+            "Pretty good! How about yourself?",
+            "All systems operational! How are you?"
+        ],
+        "name": [
+            "I'm ChatBot! Your virtual assistant.",
+            "You can call me ChatBot. What's your name?",
+            "I'm a simple chatbot. Nice to meet you!"
+        ],
+        "age": [
+            "I was born just now! 😄",
+            "I'm brand new - created today!",
+            "Age is just a number for a chatbot!"
+        ],
+        "weather": [
+            "I don't have access to weather data, but I hope it's nice out! ☀️",
+            "I wish I could check, but I'm just a simple chatbot!",
+            "I'm not connected to weather services, sorry!"
+        ],
+        "help": [
+            "I can chat with you! Try saying: hello, how are you, or tell me about yourself.",
+            "I'm a basic chatbot. I understand greetings, questions about me, and goodbyes.",
+            "Ask me about my name, age, or just say hi!"
+        ],
+        "bye": [
+            "Goodbye! It was nice talking to you! 👋",
+            "See you later! Take care!",
+            "Bye for now! Come back anytime!",
+            "Farewell! Have a great day! 🌟"
+        ],
+        "default": [
+            "I'm not sure I understand. Can you rephrase that? 🤔",
+            "Interesting! I'm still learning. Tell me more.",
+            "I don't have a response for that, but I'd love to chat!",
+            "Could you ask something else? I'm still a beginner chatbot."
+        ]
+    }
+    
+    # User's name (optional tracking)
+    user_name = None
+    
+    print("🤖 CHATBOT READY!")
+    print("=" * 50)
+    print("Hi there! I'm your friendly chatbot.")
+    print("Type 'help' to see what I can do, or 'bye' to exit.")
+    print("=" * 50)
+    
+    # Main conversation loop
+    while True:
+        # Get user input
+        user_input = input("\nYou: ").strip().lower()
+        
+        # Check for empty input
+        if not user_input:
+            print("ChatBot: You didn't say anything! 🤔")
+            continue
+        
+        # Process the input
+        response = process_input(user_input, responses, user_name)
+        print(f"ChatBot: {response}")
+        
+        # Update user name if provided
+        if "my name is" in user_input or "i am" in user_input and "name" in user_input:
+            name_parts = user_input.split()
+            for i, word in enumerate(name_parts):
+                if word in ["name", "am"] and i + 1 < len(name_parts):
+                    user_name = name_parts[i + 1].capitalize()
+                    print(f"ChatBot: Nice to meet you, {user_name}! 😊")
+        
+        # Exit condition
+        if user_input in ["bye", "goodbye", "see you", "exit", "quit"]:
+            break
+
+def process_input(user_input, responses, user_name=None):
+    """Process user input and return appropriate response"""
+    
+    # Extract the user's input
+    input_lower = user_input.lower()
+    
+    # Greeting responses
+    if any(word in input_lower for word in ["hello", "hi", "hey", "greetings", "sup", "yo"]):
+        return random.choice(responses["greeting"])
+    
+    # How are you responses
+    elif any(phrase in input_lower for phrase in ["how are you", "how's it going", "how do you do", "what's up"]):
+        return random.choice(responses["how_are_you"])
+    
+    # Name questions
+    elif any(phrase in input_lower for phrase in ["what is your name", "who are you", "your name"]):
+        return random.choice(responses["name"])
+    
+    # Age questions
+    elif any(phrase in input_lower for phrase in ["how old are you", "your age", "age"]):
+        return random.choice(responses["age"])
+    
+    # Weather questions
+    elif any(word in input_lower for word in ["weather", "temperature", "rain", "sunny", "cold", "hot"]):
+        return random.choice(responses["weather"])
+    
+    # Help requests
+    elif any(word in input_lower for word in ["help", "can you", "what can you", "capabilities"]):
+        return random.choice(responses["help"])
+    
+    # User introduces themselves
+    elif "my name is" in input_lower or "i am" in input_lower and "name" in input_lower:
+        return "Nice to meet you! 😊"
+    
+    # Goodbye responses
+    elif any(word in input_lower for word in ["bye", "goodbye", "see you", "exit", "quit", "later"]):
+        return random.choice(responses["bye"])
+    
+    # Compliments
+    elif any(phrase in input_lower for phrase in ["you are nice", "you're nice", "you are cool", "you're cool", "i like you"]):
+        return "Aww, thank you! You're pretty awesome yourself! 😊"
+    
+    # Questions about the chatbot
+    elif "what are you" in input_lower or "what is this" in input_lower:
+        return "I'm a simple rule-based chatbot built with Python. I'm here to chat with you!"
+    
+    # Default response
+    else:
+        return random.choice(responses["default"])
+
+def enhanced_chatbot():
+    """Enhanced version with more features"""
+    
+    # Extended responses
+    responses = {
+        "greeting": [
+            "Hello! 👋 Nice to meet you!",
+            "Hi there! How can I help you today?",
+            "Hey! Great to see you!",
+            "Greetings! What brings you here?"
+        ],
+        "feeling": [
+            "I'm glad to hear that! 😊",
+            "Oh no, I hope things get better!",
+            "That's interesting! Tell me more.",
+            "I see. How are you handling that?"
+        ],
+        "joke": [
+            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
+            "What do you call a fake noodle? An impasta! 😄",
+            "Why did the scarecrow win an award? Because he was outstanding in his field! 🌾",
+            "What do you call a bear with no teeth? A gummy bear! 🐻"
+        ],
+        "bye": [
+            "Goodbye! It was nice talking to you! 👋",
+            "See you later! Take care!",
+            "Bye for now! Come back anytime!",
+            "Farewell! Have a great day! 🌟"
+        ],
+        "default": [
+            "I'm not sure I understand. Can you rephrase that? 🤔",
+            "Interesting! I'm still learning. Tell me more.",
+            "I don't have a response for that, but I'd love to chat!",
+            "Could you ask something else? I'm still a beginner chatbot."
+        ]
+    }
+    
+    # Conversation stats
+    message_count = 0
+    
+    print("🤖 ENHANCED CHATBOT")
+    print("=" * 50)
+    print("I'm a smarter chatbot now! I can tell jokes, talk about feelings, and more.")
+    print("Type 'help' to see what I can do, or 'bye' to exit.")
+    print("=" * 50)
+    
+    while True:
+        user_input = input("\nYou: ").strip()
+        message_count += 1
+        
+        if not user_input:
+            print("ChatBot: 🤔 You didn't say anything!")
+            continue
+        
+        input_lower = user_input.lower()
+        
+        # Process with enhanced logic
+        if any(word in input_lower for word in ["hello", "hi", "hey", "greetings"]):
+            print(f"ChatBot: {random.choice(responses['greeting'])}")
+        
+        elif any(phrase in input_lower for phrase in ["how are you", "how's it going"]):
+            print(f"ChatBot: {random.choice(responses['feeling'])}")
+        
+        elif "joke" in input_lower or "funny" in input_lower:
+            print(f"ChatBot: {random.choice(responses['joke'])}")
+        
+        elif any(word in input_lower for word in ["bye", "goodbye", "exit", "quit"]):
+            print(f"ChatBot: {random.choice(responses['bye'])}")
+            break
+        
+        elif "help" in input_lower:
+            print("ChatBot: I can greet you, tell jokes, discuss feelings, and chat!")
+            print("Try saying: hello, how are you, tell me a joke, or goodbye.")
+        
+        elif "thank" in input_lower or "thanks" in input_lower:
+            print("ChatBot: You're welcome! 😊")
+        
+        elif "your name" in input_lower:
+            print("ChatBot: I'm ChatBot v2.0! What's your name?")
+        
+        else:
+            print(f"ChatBot: {random.choice(responses['default'])}")
+        
+        # Show conversation progress
+        if message_count % 5 == 0:
+            print(f"\n[💬 {message_count} messages exchanged so far]")
+            time.sleep(0.5)
+
+# Run the chatbot
+if __name__ == "__main__":
+    print("Choose chatbot version:")
+    print("1. Basic Chatbot")
+    print("2. Enhanced Chatbot")
+    
+    choice = input("Enter 1 or 2: ").strip()
+    
+    if choice == "2":
+        enhanced_chatbot()
+    else:
+        simple_chatbot()
