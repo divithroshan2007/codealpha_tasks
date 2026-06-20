@@ -1,0 +1,293 @@
+import csv
+import json
+from datetime import datetime
+
+# Hardcoded stock prices dictionary
+STOCK_PRICES = {
+    "AAPL": 180.50,
+    "TSLA": 250.75,
+    "MSFT": 420.30,
+    "GOOGL": 175.80,
+    "AMZN": 185.20,
+    "META": 520.90,
+    "NVDA": 950.00,
+    "JPM": 198.40,
+    "VTI": 260.15,
+    "SPY": 510.45
+}
+
+class StockPortfolioTracker:
+    def __init__(self):
+        self.portfolio = {}
+        self.total_investment = 0.0
+    
+    def add_stock(self, symbol, quantity):
+        """Add a stock to the portfolio"""
+        symbol = symbol.upper()
+        if symbol in STOCK_PRICES:
+            if symbol in self.portfolio:
+                self.portfolio[symbol] += quantity
+            else:
+                self.portfolio[symbol] = quantity
+            print(f"✓ Added {quantity} shares of {symbol}")
+            return True
+        else:
+            print(f"✗ Error: '{symbol}' not found in available stocks")
+            return False
+    
+    def remove_stock(self, symbol, quantity=None):
+        """Remove a stock from the portfolio"""
+        symbol = symbol.upper()
+        if symbol in self.portfolio:
+            if quantity is None or quantity >= self.portfolio[symbol]:
+                del self.portfolio[symbol]
+                print(f"✓ Removed all shares of {symbol}")
+            else:
+                self.portfolio[symbol] -= quantity
+                print(f"✓ Removed {quantity} shares of {symbol}")
+            return True
+        else:
+            print(f"✗ Error: '{symbol}' not in portfolio")
+            return False
+    
+    def calculate_total(self):
+        """Calculate total investment value"""
+        self.total_investment = 0.0
+        for symbol, quantity in self.portfolio.items():
+            if symbol in STOCK_PRICES:
+                value = STOCK_PRICES[symbol] * quantity
+                self.total_investment += value
+        return self.total_investment
+    
+    def display_portfolio(self):
+        """Display the portfolio with details"""
+        if not self.portfolio:
+            print("\n📊 Your portfolio is empty")
+            return
+        
+        print("\n" + "="*70)
+        print(f"{'STOCK':<10} {'QUANTITY':<12} {'PRICE':<12} {'VALUE':<15} {'% OF TOTAL'}")
+        print("-"*70)
+        
+        total = self.calculate_total()
+        for symbol, quantity in sorted(self.portfolio.items()):
+            price = STOCK_PRICES.get(symbol, 0)
+            value = price * quantity
+            percentage = (value / total * 100) if total > 0 else 0
+            print(f"{symbol:<10} {quantity:<12} ${price:<11.2f} ${value:<14.2f} {percentage:>5.1f}%")
+        
+        print("-"*70)
+        print(f"TOTAL INVESTMENT: ${total:,.2f}")
+        print("="*70)
+        return total
+    
+    def save_to_txt(self, filename="portfolio.txt"):
+        """Save portfolio data to a text file"""
+        try:
+            with open(filename, 'w') as file:
+                file.write("="*70 + "\n")
+                file.write(f"STOCK PORTFOLIO REPORT\n")
+                file.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                file.write("="*70 + "\n\n")
+                file.write(f"{'STOCK':<10} {'QUANTITY':<12} {'PRICE':<12} {'VALUE':<15}\n")
+                file.write("-"*70 + "\n")
+                
+                total = self.calculate_total()
+                for symbol, quantity in sorted(self.portfolio.items()):
+                    price = STOCK_PRICES.get(symbol, 0)
+                    value = price * quantity
+                    file.write(f"{symbol:<10} {quantity:<12} ${price:<11.2f} ${value:<14.2f}\n")
+                
+                file.write("-"*70 + "\n")
+                file.write(f"TOTAL INVESTMENT: ${total:,.2f}\n")
+                file.write("="*70 + "\n")
+            
+            print(f"✓ Portfolio saved to {filename}")
+            return True
+        except Exception as e:
+            print(f"✗ Error saving to file: {e}")
+            return False
+    
+    def save_to_csv(self, filename="portfolio.csv"):
+        """Save portfolio data to a CSV file"""
+        try:
+            with open(filename, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Stock Symbol', 'Quantity', 'Price ($)', 'Value ($)', '% of Portfolio'])
+                
+                total = self.calculate_total()
+                for symbol, quantity in sorted(self.portfolio.items()):
+                    price = STOCK_PRICES.get(symbol, 0)
+                    value = price * quantity
+                    percentage = (value / total * 100) if total > 0 else 0
+                    writer.writerow([symbol, quantity, f"{price:.2f}", f"{value:.2f}", f"{percentage:.1f}%"])
+                
+                writer.writerow([])
+                writer.writerow(['TOTAL INVESTMENT', f"${total:,.2f}"])
+                writer.writerow(['Generated', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+            
+            print(f"✓ Portfolio saved to {filename}")
+            return True
+        except Exception as e:
+            print(f"✗ Error saving to file: {e}")
+            return False
+    
+    def save_to_json(self, filename="portfolio.json"):
+        """Save portfolio data to a JSON file"""
+        try:
+            data = {
+                'portfolio': self.portfolio,
+                'prices': {k: STOCK_PRICES.get(k) for k in self.portfolio.keys()},
+                'total_value': self.calculate_total(),
+                'generated': datetime.now().isoformat()
+            }
+            
+            with open(filename, 'w') as file:
+                json.dump(data, file, indent=2)
+            
+            print(f"✓ Portfolio saved to {filename}")
+            return True
+        except Exception as e:
+            print(f"✗ Error saving to file: {e}")
+            return False
+
+
+def display_available_stocks():
+    """Display all available stocks with their prices"""
+    print("\n📈 Available Stocks:")
+    print("-" * 30)
+    for symbol, price in sorted(STOCK_PRICES.items()):
+        print(f"  {symbol:<8} ${price:>8.2f}")
+    print("-" * 30)
+
+
+def main():
+    tracker = StockPortfolioTracker()
+    
+    print("\n" + "="*50)
+    print("📊 STOCK PORTFOLIO TRACKER")
+    print("="*50)
+    
+    # Display available stocks
+    display_available_stocks()
+    
+    # Interactive mode
+    while True:
+        print("\nOptions:")
+        print("  1. Add stock")
+        print("  2. Remove stock")
+        print("  3. View portfolio")
+        print("  4. Save to file")
+        print("  5. View available stocks")
+        print("  6. Clear portfolio")
+        print("  7. Exit")
+        
+        choice = input("\nEnter your choice (1-7): ").strip()
+        
+        if choice == '1':
+            symbol = input("Enter stock symbol: ").upper()
+            try:
+                quantity = int(input("Enter quantity: "))
+                if quantity <= 0:
+                    print("✗ Quantity must be positive")
+                    continue
+                tracker.add_stock(symbol, quantity)
+            except ValueError:
+                print("✗ Please enter a valid number")
+        
+        elif choice == '2':
+            symbol = input("Enter stock symbol: ").upper()
+            try:
+                quantity = input("Enter quantity (press Enter to remove all): ").strip()
+                if quantity == '':
+                    tracker.remove_stock(symbol)
+                else:
+                    tracker.remove_stock(symbol, int(quantity))
+            except ValueError:
+                print("✗ Please enter a valid number")
+        
+        elif choice == '3':
+            tracker.display_portfolio()
+        
+        elif choice == '4':
+            print("\nSave options:")
+            print("  1. TXT file")
+            print("  2. CSV file")
+            print("  3. JSON file")
+            save_choice = input("Choose format (1-3): ").strip()
+            
+            if save_choice == '1':
+                tracker.save_to_txt()
+            elif save_choice == '2':
+                tracker.save_to_csv()
+            elif save_choice == '3':
+                tracker.save_to_json()
+            else:
+                print("✗ Invalid choice")
+        
+        elif choice == '5':
+            display_available_stocks()
+        
+        elif choice == '6':
+            confirm = input("⚠️  Are you sure you want to clear the portfolio? (y/n): ")
+            if confirm.lower() == 'y':
+                tracker.portfolio.clear()
+                tracker.total_investment = 0
+                print("✓ Portfolio cleared")
+        
+        elif choice == '7':
+            print("\n👋 Goodbye!")
+            break
+        
+        else:
+            print("✗ Invalid choice. Please try again.")
+
+
+# Alternative: Simple script mode (non-interactive)
+def script_mode():
+    """Run in script mode with predefined portfolio"""
+    print("\n" + "="*50)
+    print("📊 STOCK PORTFOLIO TRACKER - Script Mode")
+    print("="*50)
+    
+    # Predefined portfolio
+    portfolio = [
+        ("AAPL", 10),
+        ("TSLA", 5),
+        ("MSFT", 8),
+        ("GOOGL", 3)
+    ]
+    
+    tracker = StockPortfolioTracker()
+    
+    print("\n📈 Building portfolio...")
+    for symbol, quantity in portfolio:
+        tracker.add_stock(symbol, quantity)
+    
+    # Display portfolio
+    total = tracker.display_portfolio()
+    
+    # Save to files
+    print("\n💾 Saving portfolio data...")
+    tracker.save_to_txt("portfolio_report.txt")
+    tracker.save_to_csv("portfolio_data.csv")
+    tracker.save_to_json("portfolio_data.json")
+    
+    print(f"\n✅ Portfolio created with total value: ${total:,.2f}")
+
+
+if __name__ == "__main__":
+    # Choose mode
+    print("Select mode:")
+    print("  1. Interactive mode")
+    print("  2. Script mode (predefined portfolio)")
+    
+    mode = input("Enter choice (1 or 2): ").strip()
+    
+    if mode == '1':
+        main()
+    elif mode == '2':
+        script_mode()
+    else:
+        print("Invalid choice. Running interactive mode...")
+        main()
